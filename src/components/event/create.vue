@@ -75,6 +75,9 @@ import 'firebase/firestore'
 import 'firebase/storage'
 
 export default {
+  mounted () {
+    firebase.initializeApp(process.env.firebaseConfig)
+  },
   name: 'create',
   data () {
     return {
