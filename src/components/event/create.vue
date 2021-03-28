@@ -25,13 +25,6 @@
       <q-btn
         class="col"
         no-caps
-        @click="updateEvent"
-        color="primary"
-        label="Modificar"
-      />
-      <q-btn
-        class="col"
-        no-caps
         @click="getAllEvent"
         color="primary"
         label="Buscar todos"
@@ -50,19 +43,48 @@
       </q-toolbar>
       <q-list bordered>
         <q-item
-          v-for="contact in data"
-          :key="contact.id"
+          v-for="events in data"
+          :key="events.id"
           class="q-my-sm"
           clickable
           v-ripple
         >
-          <q-item-section>
-            <q-item-label>{{ contact.nmuser }}</q-item-label>
-            <q-item-label caption lines="1">{{ contact.nickname }}</q-item-label>
-            <q-item-label caption lines="1">{{ contact.senha }}</q-item-label>
+          <q-item-section @click="openModify(events)">
+            <q-item-label>{{ events.dataEvent }}</q-item-label>
+            <q-item-label
+              caption
+              lines="1"
+            >
+              {{ events.desc }}
+            </q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
+      <q-dialog
+        v-model="dialMod"
+        full-width
+      >
+      <div class="col-12 bg-white">
+        <q-bar dark class="bg-primary text-white">
+          <q-space />
+          <div
+            class="col text-center text-weight-bold"
+          >
+            Modificar evento
+          </div>
+          <q-space />
+          <q-btn
+            v-close-popup
+            flat
+            dense
+            icon="close"
+          />
+        </q-bar>
+        <DialogModify
+          :propsEvent="dataEvent"
+        />
+      </div>
+      </q-dialog>
     </div>
   </div>
 </template>
@@ -73,51 +95,46 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
+import DialogModify from './modifyEvent'
 
 export default {
   mounted () {
     firebase.initializeApp(process.env.firebaseConfig)
   },
   name: 'create',
+  components: {
+    DialogModify
+  },
   data () {
     return {
       eventObj: {
         desc: '',
         data: ''
       },
-      data: []
+      dialMod: false,
+      data: [],
+      dataEvent: []
     }
   },
   methods: {
+    openModify (obj) {
+      this.dialMod = true
+      this.dataEvent = obj
+    },
     createEvent () {
       console.log('criando ...')
 
       const db = firebase.firestore()
-      db.collection('users').add({
-        nmuser: 'Ada',
-        nickname: 'feliciti'
+      db.collection('events').add({
+        dataEvent: this.eventObj.data,
+        desc: this.eventObj.desc
       })
         .then((docRef) => {
-          console.log('Document written with ID: ', docRef.id)
+          this.getAllEvent()
+          console.log('resposta ', docRef)
         })
         .catch((error) => {
           console.error('Error adding document: ', error)
-        })
-    },
-    updateEvent () {
-      const db = firebase.firestore()
-      const washingtonRef = db.collection('users').doc('bYPlPDD2ATpVgipSUbYX')
-
-      // Set the "capital" field of the city 'DC'
-      return washingtonRef.update({
-        nmuser: 'update'
-      })
-        .then(() => {
-          console.log('updated!')
-        })
-        .catch((error) => {
-          // The document probably doesn't exist.
-          console.error('Error updating document: ', error)
         })
     },
     deleteEvent () {
@@ -129,8 +146,9 @@ export default {
       })
     },
     getAllEvent () {
+      this.data = []
       const db = firebase.firestore()
-      db.collection('users').get()
+      db.collection('events').get()
         .then((querySnapshot) => {
           console.log(querySnapshot)
           querySnapshot.forEach((doc) => {
