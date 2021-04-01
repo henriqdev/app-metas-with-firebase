@@ -29,13 +29,6 @@
         color="primary"
         label="Buscar todos"
       />
-      <q-btn
-        class="col"
-        no-caps
-        @click="deleteEvent"
-        color="primary"
-        label="deletar"
-      />
     </div>
     <div class="q-pa-md" style="max-width: 350px height: 280px">
       <q-toolbar class="bg-primary text-white shadow-2">
@@ -137,14 +130,14 @@ export default {
           console.error('Error adding document: ', error)
         })
     },
-    deleteEvent () {
-      const db = firebase.firestore()
-      db.collection('users').doc('bYPlPDD2ATpVgipSUbYX').delete().then(() => {
-        console.log('Document successfully deleted!')
-      }).catch((error) => {
-        console.error('Error removing document: ', error)
-      })
-    },
+    // deleteEvent () {
+    //   const db = firebase.firestore()
+    //   db.collection('users').doc('bYPlPDD2ATpVgipSUbYX').delete().then(() => {
+    //     console.log('Document successfully deleted!')
+    //   }).catch((error) => {
+    //     console.error('Error removing document: ', error)
+    //   })
+    // },
     getAllEvent () {
       this.data = []
       const db = firebase.firestore()
@@ -152,8 +145,12 @@ export default {
         .then((querySnapshot) => {
           console.log(querySnapshot)
           querySnapshot.forEach((doc) => {
-            this.data.push(doc.data())
-            console.log(`${doc.id} => ${doc.data()}`)
+            const res = {
+              ...doc.data(),
+              id: doc.id
+            }
+            this.data.push(res)
+            console.log(`${doc.id} => ${doc}`)
           })
         })
     }

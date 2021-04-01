@@ -10,7 +10,7 @@
     <div class="col-12">
       <q-input
         class="col-12"
-        v-model="eventObj.data"
+        v-model="eventObj.dataEvent"
         label="Data"
       />
     </div>
@@ -28,7 +28,7 @@
 
 <script>
 // import EventService from '../../service/events/methods.js'
-// import firebase from 'firebase/app'
+import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
@@ -38,33 +38,32 @@ export default {
   props: {
     propsEvent: Object
   },
-  computed: {
-    eventObj () {
-      const obj = this.propsEvent
-      return obj
-    }
-  },
   data () {
     return {
+      eventObj: {
+        desc: this.propsEvent.desc,
+        dataEvent: this.propsEvent.dataEvent
+      }
     }
   },
   methods: {
     updateEvent () {
-      console.log(this.dataEvent)
-      // const db = firebase.firestore()
-      // const washingtonRef = db.collection('events').doc('bYPlPDD2ATpVgipSUbYX')
+      console.log(this.eventObj)
+      const db = firebase.firestore()
+      const washingtonRef = db.collection('events').doc(this.propsEvent.id)
 
-      // // Set the "capital" field of the city 'DC'
-      // return washingtonRef.update({
-      //   dataEvent: 'update'
-      // })
-      //   .then(() => {
-      //     console.log('updated!')
-      //   })
-      //   .catch((error) => {
-      //     // The document probably doesn't exist.
-      //     console.error('Error updating document: ', error)
-      //   })
+      // Set the "capital" field of the city 'DC'
+      return washingtonRef.update({
+        dataEvent: '',
+        desc: ''
+      })
+        .then(() => {
+          console.log('updated!')
+        })
+        .catch((error) => {
+          // The document probably doesn't exist.
+          console.error('Error updating document: ', error)
+        })
     }
   }
 }
